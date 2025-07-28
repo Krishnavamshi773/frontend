@@ -41,7 +41,7 @@
 }
 
 .form-title {
-  color: #ff6a88;
+  color: #6889ec;
   margin-bottom: 1.7rem;
   font-size: 2.3rem;
   font-weight: 800;
@@ -113,7 +113,7 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+  background: linear-gradient(120deg, #72d0ec 0%, #6056a9 100%);
 }
 
 .form-card {
