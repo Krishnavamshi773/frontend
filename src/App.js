@@ -1,43 +1,149 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./App.css"; // Make sure this matches your filename
 
 const App = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
+    phone: "",
     password: "",
-    mobile: "",
-    course: ""
+    confirmPassword: "",
+    course: "",
   });
+
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setMessage({ type: "", text: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      return setMessage({ type: "error", text: "Passwords do not match" });
+    }
+
+    setLoading(true);
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/students/register`, // Use env var
-        formData
+        `${import.meta.env.VITE_API_URL}/api/students/register`,
+        {
+          name: formData.fullName,
+          email: formData.email,
+          mobile: formData.phone,
+          password: formData.password,
+          course: formData.course,
+        }
       );
-      alert("Registration successful");
-      console.log(res.data);
+      setMessage({ type: "success", text: "✅ Registration successful!" });
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        course: "",
+      });
     } catch (error) {
-      console.error("Registration failed:", error.response?.data || error.message);
-      alert("Error registering student: " + (error.response?.data?.error || error.message));
+      setMessage({
+        type: "error",
+        text: error.response?.data?.error || "❌ Registration failed",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white rounded shadow max-w-md mx-auto mt-10 space-y-3">
-      <input type="text" name="name" placeholder="Name" onChange={handleChange} required className="w-full p-2 border rounded" />
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 border rounded" />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-2 border rounded" />
-      <input type="text" name="mobile" placeholder="Mobile" onChange={handleChange} required className="w-full p-2 border rounded" />
-      <input type="text" name="course" placeholder="Course" onChange={handleChange} required className="w-full p-2 border rounded" />
-      <button type="submit" className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Register</button>
-    </form>
+    <div className="main-bg">
+      <form onSubmit={handleSubmit} className="form-card">
+        <h2 className="form-title">Student Registration</h2>
+
+        {message.text && (
+          <div
+            className={`text-sm mb-4 p-3 rounded text-center font-semibold ${
+              message.type === "success"
+                ? "text-green-700 bg-green-100"
+                : "text-red-700 bg-red-100"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <input
+          type="text"
+          name="fullName"
+          placeholder="Full Name"
+          value={formData.fullName}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone Number"
+          value={formData.phone}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <input
+          type="text"
+          name="course"
+          placeholder="Course"
+          value={formData.course}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+
+        <button
+          type="submit"
+          className="form-btn"
+          disabled={loading}
+        >
+          {loading ? "Registering..." : "Register"}
+        </button>
+      </form>
+    </div>
   );
 };
 
